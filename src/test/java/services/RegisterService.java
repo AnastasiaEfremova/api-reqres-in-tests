@@ -3,16 +3,16 @@ package services;
 import io.qameta.allure.Step;
 import models.register.RegisterRequest;
 import models.register.RegisterResponse;
-import models.register.ErrorResponse;
+import models.ErrorResponse;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static api.RegisterApiClient.*;
 
 public class RegisterService {
 
-    @Step("Успешная регистрация с предопределенным пользователем")
+    @Step("Успешная регистрация")
     public static RegisterResponse registerSuccess() {
-        // Согласно документации Reqres.in, успешная регистрация только с определенными данными
+
         RegisterRequest request = new RegisterRequest("eve.holt@reqres.in", "pistol");
         RegisterResponse response = register(request);
 

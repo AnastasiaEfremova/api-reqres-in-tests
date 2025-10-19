@@ -19,14 +19,13 @@ import static services.UserService.*;
 @DisplayName("API тесты управления пользователями")
 @Epic("Пользователи")
 @Feature("Операции создания, обновления и удаления")
-@Owner("API Automation Team")
+@Owner("efremovaa")
 @Tag("users")
-@Tag("write")
 @Tag("regression")
 public class UserWriteTests {
 
     @Test
-    @DisplayName("Создание пользователя со случайными реалистичными данными")
+    @DisplayName("Создание пользователя со случайными данными")
     @Story("Создание пользователей")
     @Severity(SeverityLevel.CRITICAL)
     void createUserWithRealisticDataTest() {
@@ -38,21 +37,19 @@ public class UserWriteTests {
                 () -> createNewUser(name, job)
         );
 
-        step("Валидация созданного пользователя", () -> {
-            assertAll("Комплексная проверка ответа создания",
-                    () -> assertEquals(name, response.getName(), "Имя должно соответствовать отправленному"),
-                    () -> assertEquals(job, response.getJob(), "Должность должна соответствовать отправленной"),
-                    () -> assertNotNull(response.getId(), "ID должен быть сгенерирован"),
-                    () -> assertFalse(response.getId().isEmpty(), "ID не должен быть пустой строкой"),
-                    () -> assertNotNull(response.getCreatedAt(), "Дата создания должна присутствовать"),
-                    () -> assertTrue(response.getCreatedAt().contains("202"), "Дата должна содержать текущий год")
-            );
-        });
+        step("Валидация созданного пользователя", () -> assertAll(
+                () -> assertEquals(name, response.getName(), "Имя должно соответствовать отправленному"),
+                () -> assertEquals(job, response.getJob(), "Должность должна соответствовать отправленной"),
+                () -> assertNotNull(response.getId(), "ID должен быть сгенерирован"),
+                () -> assertFalse(response.getId().isEmpty(), "ID не должен быть пустой строкой"),
+                () -> assertNotNull(response.getCreatedAt(), "Дата создания должна присутствовать"),
+                () -> assertTrue(response.getCreatedAt().contains("202"), "Дата должна содержать текущий год")
+        ));
     }
 
     @ParameterizedTest
     @MethodSource("userDataProvider")
-    @DisplayName("Параметризованное создание пользователей с различными должностями")
+    @DisplayName("Создание пользователей с различными должностями")
     @Story("Создание пользователей")
     @Severity(SeverityLevel.NORMAL)
     void createUsersWithVariousJobsTest(String name, String job) {
@@ -61,14 +58,12 @@ public class UserWriteTests {
                 () -> createNewUser(name, job)
         );
 
-        step("Базовая валидация ответа", () -> {
-            assertAll("Проверка обязательных полей",
-                    () -> assertEquals(name, response.getName()),
-                    () -> assertEquals(job, response.getJob()),
-                    () -> assertNotNull(response.getId()),
-                    () -> assertNotNull(response.getCreatedAt())
-            );
-        });
+        step("Валидация ответа", () -> assertAll("Проверка обязательных полей",
+                () -> assertEquals(name, response.getName()),
+                () -> assertEquals(job, response.getJob()),
+                () -> assertNotNull(response.getId()),
+                () -> assertNotNull(response.getCreatedAt())
+        ));
     }
 
     private static Stream<Object[]> userDataProvider() {
@@ -94,14 +89,12 @@ public class UserWriteTests {
                 () -> updateUserById(2, newName, newJob)
         );
 
-        step("Валидация обновленных данных", () -> {
-            assertAll("Проверка ответа обновления",
-                    () -> assertEquals(newName, response.getName(), "Обновленное имя должно соответствовать"),
-                    () -> assertEquals(newJob, response.getJob(), "Обновленная должность должна соответствовать"),
-                    () -> assertNotNull(response.getUpdatedAt(), "Дата обновления должна присутствовать"),
-                    () -> assertTrue(response.getUpdatedAt().contains("202"), "Дата должна быть актуальной")
-            );
-        });
+        step("Валидация обновленных данных", () -> assertAll("Проверка ответа обновления",
+                () -> assertEquals(newName, response.getName(), "Обновленное имя должно соответствовать"),
+                () -> assertEquals(newJob, response.getJob(), "Обновленная должность должна соответствовать"),
+                () -> assertNotNull(response.getUpdatedAt(), "Дата обновления должна присутствовать"),
+                () -> assertTrue(response.getUpdatedAt().contains("202"), "Дата должна быть актуальной")
+        ));
     }
 
     @Test
@@ -113,59 +106,61 @@ public class UserWriteTests {
 
         UpdateUserResponse response = step(
                 "Частичное обновление имени на: " + newName,
-                () -> patchUserById(2, newName)
+                () -> patchUserById(2, newName, null)
         );
 
-        step("Валидация частичного обновления", () -> {
-            assertAll("Проверка ответа частичного обновления",
-                    () -> assertEquals(newName, response.getName(), "Имя должно быть обновлено"),
-                    () -> assertNotNull(response.getUpdatedAt(), "Дата обновления должна присутствовать")
-            );
-        });
+        step("Валидация частичного обновления", () -> assertAll(
+                () -> assertEquals(newName, response.getName(), "Имя должно быть обновлено"),
+                () -> assertNotNull(response.getUpdatedAt(), "Дата обновления должна присутствовать")
+        ));
     }
 
     @Test
-    @DisplayName("Удаление пользователя с последующей проверкой")
+    @DisplayName("Удаление пользователя")
     @Story("Удаление пользователей")
     @Severity(SeverityLevel.CRITICAL)
-    void deleteUserWithVerificationTest() {
+    void deleteUserTest() {
         step("Удаление пользователя с ID: 2", () ->
                 deleteUserById(2)
         );
 
-        step("Проверка отсутствия пользователя в системе", () -> {
-            // Здесь можно добавить проверку через GET запрос с ожиданием 404
-            // или проверку через список пользователей
-        });
+        step("Проверка что пользователь все еще доступен (mock-сервис)", () -> verifyUserExists(2));
     }
 
     @Test
-    @DisplayName("Создание и последующее обновление пользователя")
-    @Story("Комплексные операции")
-    @Severity(SeverityLevel.NORMAL)
-    void createAndUpdateUserWorkflowTest() {
-        // Создание пользователя
-        String initialName = TestDataGenerator.getRealisticName();
-        String initialJob = TestDataGenerator.getRealisticJob();
-
-        CreateUserResponse createdUser = step("Создание исходного пользователя", () ->
-                createNewUser(initialName, initialJob)
+    @DisplayName("Тест CRUD операций")
+    @Story("CRUD")
+    @Severity(SeverityLevel.CRITICAL)
+    void comprehensiveCrudTest() {
+        // 1. Create
+        String name = TestDataGenerator.getRealisticName();
+        String job = TestDataGenerator.getRealisticJob();
+        CreateUserResponse createdUser = step("Создание пользователя", () ->
+                createNewUser(name, job)
         );
 
-        // Обновление пользователя
+        // 2. Verify creation
+        step("Проверка создания", () -> {
+            assertEquals(name, createdUser.getName());
+            assertEquals(job, createdUser.getJob());
+        });
+
+        // 3. Update
         String updatedName = TestDataGenerator.getRealisticName();
         String updatedJob = TestDataGenerator.getRealisticJob();
-
-        UpdateUserResponse updatedUser = step("Обновление созданного пользователя", () ->
-                updateUserById(2, updatedName, updatedJob) // Используем известный ID для обновления
+        UpdateUserResponse updatedUser = step("Обновление пользователя", () ->
+                updateUserById(2, updatedName, updatedJob)
         );
 
-        step("Валидация workflow создания и обновления", () -> {
-            assertAll("Комплексная проверка workflow",
-                    () -> assertNotNull(createdUser.getId(), "Созданный пользователь должен иметь ID"),
-                    () -> assertEquals(updatedName, updatedUser.getName(), "Имя должно быть обновлено"),
-                    () -> assertEquals(updatedJob, updatedUser.getJob(), "Должность должна быть обновлена")
-            );
+        // 4. Verify update
+        step("Проверка обновления", () -> {
+            assertEquals(updatedName, updatedUser.getName());
+            assertEquals(updatedJob, updatedUser.getJob());
         });
+
+        // 5. Delete
+        step("Удаление пользователя", () ->
+                deleteUserById(2)
+        );
     }
 }

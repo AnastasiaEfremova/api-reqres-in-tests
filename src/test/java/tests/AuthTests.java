@@ -2,6 +2,7 @@ package tests;
 
 import io.qameta.allure.*;
 import models.login.LoginResponse;
+import models.ErrorResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -11,23 +12,23 @@ import services.AuthService;
 import utils.TestDataGenerator;
 
 import static io.qameta.allure.Allure.step;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static services.AuthService.*;
 
 @DisplayName("API тесты авторизации")
 @Epic("Безопасность")
 @Feature("Аутентификация пользователей")
-@Owner("API Automation Team")
+@Owner("efremovaa")
 @Tag("auth")
 @Tag("regression")
 public class AuthTests {
-
     @Test
-    @DisplayName("Успешная авторизация с пользователем по умолчанию")
+    @DisplayName("Успешная авторизация")
     @Story("Позитивные сценарии авторизации")
     @Severity(SeverityLevel.CRITICAL)
     void successLoginWithDefaultUserTest() {
         LoginResponse response = step("Авторизация с предустановленными учетными данными",
-                AuthService::loginWithDefaultUser
+                AuthService::successLogin
         );
 
         step("Валидация токена авторизации", () ->
@@ -40,11 +41,11 @@ public class AuthTests {
             "eve.holt@reqres.in, cityslicka",
             "emma.wong@reqres.in, cityslicka"
     })
-    @DisplayName("Параметризованная авторизация различных пользователей")
+    @DisplayName("Авторизация различных пользователей")
     @Story("Позитивные сценарии авторизации")
     @Severity(SeverityLevel.CRITICAL)
     void loginWithDifferentUsersTest(String email, String password) {
-        LoginResponse response = step("Аутентификация пользователя: " + email, () ->
+        LoginResponse response = step("Авторизация пользователя: " + email, () ->
                 loginWithCredentials(email, password)
         );
 
@@ -61,21 +62,26 @@ public class AuthTests {
         String randomEmail = TestDataGenerator.getRandomEmail();
         String randomPassword = TestDataGenerator.getRandomPassword();
 
-        step("Попытка входа с сгенерированными неверными данными", () -> {
-            // Здесь нужно добавить метод для обработки неуспешной авторизации
-            // loginWithInvalidCredentials(randomEmail, randomPassword);
-        });
+        ErrorResponse response = step("Попытка входа с сгенерированными неверными данными", () ->
+                AuthService.loginWithInvalidCredentials(randomEmail, randomPassword)
+        );
+
+        step("Проверка сообщения об ошибке", () ->
+                assertEquals("user not found", response.getError().toLowerCase())
+        );
     }
 
     @Test
-    @DisplayName("Авторизация с некорректным форматом email")
-    @Story("Валидация входных данных")
+    @DisplayName("Авторизация без пароля")
+    @Story("Негативные сценарии авторизации")
     @Severity(SeverityLevel.NORMAL)
-    void loginWithInvalidEmailFormatTest() {
-        String invalidEmail = TestDataGenerator.getInvalidEmail();
+    void loginWithoutPasswordTest() {
+        ErrorResponse response = step("Попытка авторизации без пароля", () ->
+                AuthService.loginWithInvalidCredentials("test@example.com", "")
+        );
 
-        step("Попытка авторизации с email: " + invalidEmail, () -> {
-            // Обработка ошибки валидации
-        });
+        step("Проверка ошибки валидации", () ->
+                assertEquals("Missing password", response.getError())
+        );
     }
 }

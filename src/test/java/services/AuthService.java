@@ -4,17 +4,18 @@ import io.qameta.allure.Step;
 import models.login.LoginRequest;
 import models.login.LoginResponse;
 import config.ReqresConfigProvider;
+import models.ErrorResponse;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static api.AuthApiClient.login;
+import static api.AuthApiClient.*;
 
 public class AuthService {
 
-    @Step("Авторизация с пользователем по умолчанию")
-    public static LoginResponse loginWithDefaultUser() {
+    @Step("Успешная авторизация")
+    public static LoginResponse successLogin() {
         LoginRequest request = new LoginRequest(
-                ReqresConfigProvider.config.defaultEmail(),
-                ReqresConfigProvider.config.defaultPassword()
+                ReqresConfigProvider.config.email(),
+                ReqresConfigProvider.config.password()
         );
         LoginResponse response = login(request);
         verifySuccessfulLogin(response);
@@ -26,6 +27,18 @@ public class AuthService {
         LoginRequest request = new LoginRequest(email, password);
         LoginResponse response = login(request);
         verifySuccessfulLogin(response);
+        return response;
+    }
+
+    @Step("Попытка авторизации с неверными данными")
+    public static ErrorResponse loginWithInvalidCredentials(String email, String password) {
+        LoginRequest request = new LoginRequest(email, password);
+        ErrorResponse response = loginError(request);
+
+        assertAll("Проверка ошибки авторизации",
+                () -> assertNotNull(response.getError(), "Сообщение об ошибке должно присутствовать"),
+                () -> assertFalse(response.getError().isEmpty(), "Сообщение об ошибке не должно быть пустым")
+        );
         return response;
     }
 
@@ -43,10 +56,5 @@ public class AuthService {
                 () -> assertNotNull(response.getToken(), "Токен не должен быть null"),
                 () -> assertEquals(expectedToken, response.getToken(), "Токен должен соответствовать")
         );
-    }
-
-    @Step("Получение токена для API запросов")
-    public static String getAuthToken() {
-        return loginWithDefaultUser().getToken();
     }
 }

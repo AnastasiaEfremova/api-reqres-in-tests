@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegisterRequest {
-    private String email;  // В Reqres.in используется email вместо username
+    private String email;
     private String password;
 }

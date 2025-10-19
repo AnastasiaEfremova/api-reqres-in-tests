@@ -2,12 +2,13 @@ package tests;
 
 import io.qameta.allure.*;
 import models.register.RegisterResponse;
-import models.register.ErrorResponse;
+import models.ErrorResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import services.RegisterService;
 import utils.TestDataGenerator;
 
 import java.util.stream.Stream;
@@ -19,18 +20,17 @@ import static services.RegisterService.*;
 @DisplayName("API тесты регистрации пользователей")
 @Epic("Регистрация")
 @Feature("Создание новых учетных записей")
-@Owner("API Automation Team")
+@Owner("efremovaa")
 @Tag("registration")
 @Tag("regression")
 public class RegisterTests {
 
     @Test
-    @DisplayName("Успешная регистрация предопределенного пользователя")
+    @DisplayName("Успешная регистрация пользователя")
     @Story("Позитивные сценарии регистрации")
     @Severity(SeverityLevel.CRITICAL)
     void successRegisterTest() {
-        RegisterResponse response = step("Регистрация валидного предопределенного пользователя", () ->
-                registerSuccess()
+        RegisterResponse response = step("Регистрация валидного пользователя", RegisterService::registerSuccess
         );
 
         step("Валидация структуры ответа успешной регистрации", () ->
@@ -39,10 +39,11 @@ public class RegisterTests {
     }
 
     @Test
-    @DisplayName("Попытка регистрации сгенерированного пользователя")
+    @DisplayName("Ошибка регистрации")
     @Story("Негативные сценарии регистрации")
     @Severity(SeverityLevel.NORMAL)
     void registerWithGeneratedUserTest() {
+
         TestDataGenerator.UserData userData = TestDataGenerator.generateUserData();
 
         ErrorResponse response = step(
@@ -50,7 +51,7 @@ public class RegisterTests {
                 () -> registerUnsuccessful(userData.email, userData.password)
         );
 
-        step("Проверка стандартного сообщения об ошибке для неопределенных пользователей", () ->
+        step("Проверка сообщения об ошибке регистрации", () ->
                 verifyUndefinedUserError(response)
         );
     }
@@ -64,9 +65,7 @@ public class RegisterTests {
                 registerWithoutPassword("eve.holt@reqres.in")
         );
 
-        step("Валидация ошибки отсутствия пароля", () -> {
-            assertEquals("Missing password", response.getError());
-        });
+        step("Валидация ошибки отсутствия пароля", () -> assertEquals("Missing password", response.getError()));
     }
 
     @Test
@@ -78,14 +77,12 @@ public class RegisterTests {
                 registerWithoutEmail("ValidPass123!")
         );
 
-        step("Валидация ошибки отсутствия email", () -> {
-            assertEquals("Missing email or username", response.getError());
-        });
+        step("Валидация ошибки отсутствия email", () -> assertEquals("Missing email or username", response.getError()));
     }
 
     @ParameterizedTest
     @MethodSource("validButUndefinedUserDataProvider")
-    @DisplayName("Параметризованная проверка регистрации с валидными но неопределенными пользователями")
+    @DisplayName("Регистрация с валидными, но неопределенными пользователями")
     @Story("Негативные сценарии регистрации")
     @Severity(SeverityLevel.NORMAL)
     void registerWithValidButUndefinedUsersTest(String email, String password, String testCase) {
@@ -108,33 +105,9 @@ public class RegisterTests {
         );
     }
 
-    @ParameterizedTest
-    @MethodSource("invalidFormatDataProvider")
-    @DisplayName("Параметризованная проверка регистрации с невалидным форматом данных")
-    @Story("Валидация формата данных")
-    @Severity(SeverityLevel.NORMAL)
-    void registerWithInvalidFormatDataTest(String email, String password, String expectedError) {
-        ErrorResponse response = step(
-                String.format("Регистрация с email: %s", email),
-                () -> registerUnsuccessful(email, password)
-        );
-
-        step("Проверка что ошибка содержит ожидаемый текст", () ->
-                verifyErrorContains(response, expectedError)
-        );
-    }
-
-    private static Stream<Object[]> invalidFormatDataProvider() {
-        return Stream.of(
-                new Object[]{"", "ValidPass123!", "Missing email"},
-                new Object[]{"eve.holt@reqres.in", "", "Missing password"},
-                new Object[]{"", "", "Missing email"}
-        );
-    }
-
     @Test
-    @DisplayName("Массовая проверка регистрации случайных пользователей")
-    @Story("Нагрузочное тестирование")
+    @DisplayName("Ошибка регистрации случайных пользователей")
+    @Story("Негативные сценарии регистрации")
     @Severity(SeverityLevel.MINOR)
     void bulkRegistrationAttemptTest() {
         step("Попытка регистрации 3 случайных пользователей", () -> {

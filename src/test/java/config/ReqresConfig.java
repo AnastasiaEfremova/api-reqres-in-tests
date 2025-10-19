@@ -18,15 +18,11 @@ public interface ReqresConfig extends Config {
     @DefaultValue("reqres-free-v1")
     String apiKey();
 
-    @Key("default.email")
+    @Key("email")
     @DefaultValue("eve.holt@reqres.in")
-    String defaultEmail();
+    String email();
 
-    @Key("default.password")
+    @Key("password")
     @DefaultValue("cityslicka")
-    String defaultPassword();
-
-    @Key("test.user.id")
-    @DefaultValue("2")
-    String testUserId();
+    String password();
 }

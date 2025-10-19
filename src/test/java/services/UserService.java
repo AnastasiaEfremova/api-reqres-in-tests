@@ -4,7 +4,6 @@ import io.qameta.allure.Step;
 import models.createUser.CreateUserRequest;
 import models.createUser.CreateUserResponse;
 import models.getUsers.UserResponse;
-import models.getUsers.UsersResponse;
 import models.updateUser.UpdateUserRequest;
 import models.updateUser.UpdateUserResponse;
 
@@ -12,16 +11,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static api.UsersApiClient.*;
 
 public class UserService {
-
-    @Step("Получение списка пользователей на странице {page}")
-    public static UsersResponse getUsersList(int page) {
-        UsersResponse response = getUsers(page);
-        assertAll("Проверка структуры ответа списка пользователей",
-                () -> assertNotNull(response.getPage(), "Page should not be null"),
-                () -> assertFalse(response.getData().isEmpty(), "Users list should not be empty")
-        );
-        return response;
-    }
 
     @Step("Получение пользователя по ID: {userId}")
     public static UserResponse getUserById(int userId) {
@@ -61,20 +50,33 @@ public class UserService {
     }
 
     @Step("Частичное обновление пользователя ID: {userId}")
-    public static UpdateUserResponse patchUserById(int userId, String name) {
-        UpdateUserRequest request = new UpdateUserRequest(name, null);
+    public static UpdateUserResponse patchUserById(int userId, String name, String job) {
+        UpdateUserRequest request = new UpdateUserRequest(name, job);
         UpdateUserResponse response = patchUser(request, userId);
 
         assertAll("Проверка частично обновленного пользователя",
-                () -> assertEquals(name, response.getName(), "Patched name should match"),
                 () -> assertNotNull(response.getUpdatedAt(), "Update date should be present")
         );
+        if (name != null) {
+            assertEquals(name, response.getName(), "Patched name should match");
+        }
+        if (job != null) {
+            assertEquals(job, response.getJob(), "Patched job should match");
+        }
         return response;
     }
 
     @Step("Удаление пользователя ID: {userId}")
     public static void deleteUserById(int userId) {
         deleteUser(userId);
-        // Для DELETE проверяем только статус код 204 через ResponseSpec
+    }
+
+    @Step("Проверка что пользователь существует")
+    public static void verifyUserExists(int userId) {
+        UserResponse response = getUserById(userId);
+        assertAll("Проверка существования пользователя",
+                () -> assertNotNull(response.getData(), "User data should exist"),
+                () -> assertEquals(userId, response.getData().getId(), "User ID should match")
+        );
     }
 }
