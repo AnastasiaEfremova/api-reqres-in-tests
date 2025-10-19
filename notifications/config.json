@@ -1,0 +1,17 @@
+{
+  "base": {
+    "project": "ui-mts-job-tests",
+    "environment": "qa.guru",
+    "comment": "comment here @efremova_anastasiaa",
+    "reportLink": "",
+    "language": "en",
+    "messenger": "telegram",
+    "allureFolder": "build/allure-report/",
+    "enableChart": true
+  },
+  "telegram": {
+    "token": "8357487500:AAG0SdHmPkZSXlkj71eKFR1xQuTKGhmbsJY",
+    "chat": "-4869323660",
+    "replyTo": ""
+  }
+}

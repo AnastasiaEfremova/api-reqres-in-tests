@@ -1,0 +1,60 @@
+plugins {
+    id 'java-library'
+    id 'io.qameta.allure' version '2.11.2'
+    id "io.freefair.lombok" version "6.0.0-m2"
+}
+
+repositories {
+    mavenCentral()
+}
+
+def restAssuredVersion = "5.3.1",
+    allureVersion = "2.21.0"
+
+allure {
+    report {
+        version.set(allureVersion)
+    }
+    adapter {
+        aspectjWeaver.set(true)
+        frameworks {
+            junit5 {
+                adapterVersion.set(allureVersion)
+            }
+        }
+    }
+}
+
+compileJava {
+    options.encoding = 'UTF-8'
+}
+compileTestJava {
+    options.encoding = 'UTF-8'
+}
+
+group = 'org.examle'
+version = '1.0-SNAPSHOT'
+
+dependencies {
+    testImplementation(
+            "io.rest-assured:rest-assured:$restAssuredVersion",
+            "com.fasterxml.jackson.core:jackson-databind:2.20.0",
+            "io.qameta.allure:allure-rest-assured:$allureVersion",
+            "org.junit.jupiter:junit-jupiter:5.10.0",
+            'org.slf4j:slf4j-simple:2.0.7',
+            'org.aeonbits.owner:owner:1.0.4',
+            'net.datafaker:datafaker:1.9.0'
+    )
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+    systemProperty "console.encoding", "UTF-8"
+    systemProperties(System.getProperties())
+
+    testLogging {
+        events "started", "skipped", "failed", "standard_error", "standard_out"
+        exceptionFormat "short"
+        showStandardStreams = true
+    }
+}
