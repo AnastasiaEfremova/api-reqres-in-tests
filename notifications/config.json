@@ -1,6 +1,6 @@
 {
   "base": {
-    "project": "ui-mts-job-tests",
+    "project": "api-reqres-in-tests",
     "environment": "qa.guru",
     "comment": "comment here @efremova_anastasiaa",
     "reportLink": "",
