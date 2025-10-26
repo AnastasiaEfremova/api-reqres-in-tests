@@ -1,8 +1,8 @@
 package services;
 
 import io.qameta.allure.Step;
-import models.login.LoginRequest;
-import models.login.LoginResponse;
+import models.auth.AuthRequest;
+import models.auth.LoginResponse;
 import config.ReqresConfigProvider;
 import models.ErrorResponse;
 
@@ -13,7 +13,7 @@ public class AuthService {
 
     @Step("Успешная авторизация")
     public static LoginResponse successLogin() {
-        LoginRequest request = new LoginRequest(
+        AuthRequest request = new AuthRequest(
                 ReqresConfigProvider.config.email(),
                 ReqresConfigProvider.config.password()
         );
@@ -24,7 +24,7 @@ public class AuthService {
 
     @Step("Авторизация с email: {email}")
     public static LoginResponse loginWithCredentials(String email, String password) {
-        LoginRequest request = new LoginRequest(email, password);
+        AuthRequest request = new AuthRequest(email, password);
         LoginResponse response = login(request);
         verifySuccessfulLogin(response);
         return response;
@@ -32,7 +32,7 @@ public class AuthService {
 
     @Step("Попытка авторизации с неверными данными")
     public static ErrorResponse loginWithInvalidCredentials(String email, String password) {
-        LoginRequest request = new LoginRequest(email, password);
+        AuthRequest request = new AuthRequest(email, password);
         ErrorResponse response = loginError(request);
 
         assertAll("Проверка ошибки авторизации",
@@ -52,9 +52,20 @@ public class AuthService {
 
     @Step("Проверка авторизации с конкретным токеном")
     public static void verifyLoginWithToken(LoginResponse response, String expectedToken) {
-        assertAll("Проверка ответа авторизации с токеном",
+        assertAll(
                 () -> assertNotNull(response.getToken(), "Токен не должен быть null"),
-                () -> assertEquals(expectedToken, response.getToken(), "Токен должен соответствовать")
+                () -> assertEquals(expectedToken, response.getToken(), "Токен должен соответствовать"),
+                () -> assertFalse(response.getToken().isEmpty(), "Токен не должен быть пустой строкой"),
+                () -> assertTrue(response.getToken().trim().length() > 0, "Токен не должен состоять только из пробелов"),
+                () -> assertTrue(response.getToken().length() >= 8, "Токен должен содержать минимум 8 символов"),
+                () -> assertTrue(response.getToken().matches("^[a-zA-Z0-9]+$"), "Токен должен содержать только буквы и цифры"),
+                () -> assertTrue(hasBothLettersAndNumbers(response.getToken()), "Токен должен содержать и буквы, и цифры")
         );
+    }
+
+    private static boolean hasBothLettersAndNumbers(String token) {
+        boolean hasLetters = token.matches(".*[a-zA-Z].*");
+        boolean hasNumbers = token.matches(".*\\d.*");
+        return hasLetters && hasNumbers;
     }
 }

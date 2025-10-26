@@ -1,11 +1,10 @@
 package api;
 
-import models.createUser.CreateUserRequest;
-import models.createUser.CreateUserResponse;
-import models.getUsers.UserResponse;
-import models.getUsers.UsersResponse;
-import models.updateUser.UpdateUserRequest;
-import models.updateUser.UpdateUserResponse;
+import models.users.CreateUserResponse;
+import models.users.UserRequest;
+import models.users.UserResponse;
+import models.users.UsersResponse;
+import models.users.UpdateUserResponse;
 
 import static io.restassured.RestAssured.given;
 import static specs.ApiSpecs.*;
@@ -32,7 +31,7 @@ public class UsersApiClient {
                 .extract().as(UserResponse.class);
     }
 
-    public static CreateUserResponse createUser(CreateUserRequest user) {
+    public static CreateUserResponse createUser(UserRequest user) {
         return given(getUsersSpec())
                 .body(user)
                 .when()
@@ -42,7 +41,7 @@ public class UsersApiClient {
                 .extract().as(CreateUserResponse.class);
     }
 
-    public static UpdateUserResponse updateUser(UpdateUserRequest user, int userId) {
+    public static UpdateUserResponse updateUser(UserRequest user, int userId) {
         return given(getUsersSpec())
                 .pathParam("id", userId)
                 .body(user)
@@ -53,7 +52,7 @@ public class UsersApiClient {
                 .extract().as(UpdateUserResponse.class);
     }
 
-    public static UpdateUserResponse patchUser(UpdateUserRequest user, int userId) {
+    public static UpdateUserResponse patchUser(UserRequest user, int userId) {
         return given(getUsersSpec())
                 .pathParam("id", userId)
                 .body(user)

@@ -1,8 +1,8 @@
 package services;
 
 import io.qameta.allure.Step;
-import models.register.RegisterRequest;
-import models.register.RegisterResponse;
+import models.auth.AuthRequest;
+import models.auth.RegisterResponse;
 import models.ErrorResponse;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,7 +13,7 @@ public class RegisterService {
     @Step("Успешная регистрация")
     public static RegisterResponse registerSuccess() {
 
-        RegisterRequest request = new RegisterRequest("eve.holt@reqres.in", "pistol");
+        AuthRequest request = new AuthRequest("eve.holt@reqres.in", "pistol");
         RegisterResponse response = register(request);
 
         assertAll("Проверка успешной регистрации",
@@ -27,7 +27,7 @@ public class RegisterService {
 
     @Step("Попытка регистрации с неопределенным пользователем")
     public static ErrorResponse registerUnsuccessful(String email, String password) {
-        RegisterRequest request = new RegisterRequest(email, password);
+        AuthRequest request = new AuthRequest(email, password);
         ErrorResponse response = registerError(request);
 
         assertAll("Проверка ошибки регистрации",
@@ -39,7 +39,7 @@ public class RegisterService {
 
     @Step("Регистрация без пароля")
     public static ErrorResponse registerWithoutPassword(String email) {
-        RegisterRequest request = new RegisterRequest(email, "");
+        AuthRequest request = new AuthRequest(email, "");
         ErrorResponse response = registerError(request);
 
         assertAll("Проверка ошибки отсутствия пароля",
@@ -52,7 +52,7 @@ public class RegisterService {
 
     @Step("Регистрация без email")
     public static ErrorResponse registerWithoutEmail(String password) {
-        RegisterRequest request = new RegisterRequest("", password);
+        AuthRequest request = new AuthRequest("", password);
         ErrorResponse response = registerError(request);
 
         assertAll("Проверка ошибки отсутствия email",
@@ -71,12 +71,6 @@ public class RegisterService {
                 () -> assertFalse(response.getId().isEmpty(), "ID не должен быть пустым"),
                 () -> assertFalse(response.getToken().isEmpty(), "Token не должен быть пустым")
         );
-    }
-
-    @Step("Проверка что ошибка соответствует ожидаемой")
-    public static void verifyErrorContains(ErrorResponse response, String expectedError) {
-        assertTrue(response.getError().contains(expectedError),
-                "Ошибка должна содержать: " + expectedError + ", но получили: " + response.getError());
     }
 
     @Step("Проверка стандартной ошибки для неопределенных пользователей")

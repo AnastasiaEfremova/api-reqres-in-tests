@@ -1,7 +1,7 @@
 package api;
 
-import models.register.RegisterRequest;
-import models.register.RegisterResponse;
+import models.auth.AuthRequest;
+import models.auth.RegisterResponse;
 import models.ErrorResponse;
 
 import static io.restassured.RestAssured.given;
@@ -9,7 +9,7 @@ import static specs.ApiSpecs.*;
 
 public class RegisterApiClient {
 
-    public static RegisterResponse register(RegisterRequest registerBody) {
+    public static RegisterResponse register(AuthRequest registerBody) {
         return given(getRegisterSpec())
                 .body(registerBody)
                 .when()
@@ -19,7 +19,7 @@ public class RegisterApiClient {
                 .extract().as(RegisterResponse.class);
     }
 
-    public static ErrorResponse registerError(RegisterRequest registerBody) {
+    public static ErrorResponse registerError(AuthRequest registerBody) {
         return given(getRegisterSpec())
                 .body(registerBody)
                 .when()

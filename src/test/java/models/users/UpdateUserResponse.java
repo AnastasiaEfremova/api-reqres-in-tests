@@ -1,4 +1,4 @@
-package models.updateUser;
+package models.users;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

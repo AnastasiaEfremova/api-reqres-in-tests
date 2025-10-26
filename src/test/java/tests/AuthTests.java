@@ -1,7 +1,7 @@
 package tests;
 
 import io.qameta.allure.*;
-import models.login.LoginResponse;
+import models.auth.LoginResponse;
 import models.ErrorResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;

@@ -50,25 +50,24 @@ public class ApiSpecs {
                 .build();
     }
 
-    // Спецификации для конкретных эндпоинтов
     public static RequestSpecification getAuthSpec() {
         return new RequestSpecBuilder()
                 .addRequestSpecification(getBaseSpec())
-                .setBasePath("/api/login")
+                .setBasePath("/login")
                 .build();
     }
 
     public static RequestSpecification getUsersSpec() {
         return new RequestSpecBuilder()
                 .addRequestSpecification(getBaseSpec())
-                .setBasePath("/api/users")
+                .setBasePath("/users")
                 .build();
     }
 
     public static RequestSpecification getRegisterSpec() {
         return new RequestSpecBuilder()
                 .addRequestSpecification(getBaseSpec())
-                .setBasePath("/api/register")
+                .setBasePath("/register")
                 .build();
     }
 }

@@ -1,8 +1,8 @@
 package tests;
 
 import io.qameta.allure.*;
-import models.createUser.CreateUserResponse;
-import models.updateUser.UpdateUserResponse;
+import models.users.CreateUserResponse;
+import models.users.UpdateUserResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -132,33 +132,29 @@ public class UserWriteTests {
     @Story("CRUD")
     @Severity(SeverityLevel.CRITICAL)
     void comprehensiveCrudTest() {
-        // 1. Create
+
         String name = TestDataGenerator.getRealisticName();
         String job = TestDataGenerator.getRealisticJob();
         CreateUserResponse createdUser = step("Создание пользователя", () ->
                 createNewUser(name, job)
         );
 
-        // 2. Verify creation
         step("Проверка создания", () -> {
             assertEquals(name, createdUser.getName());
             assertEquals(job, createdUser.getJob());
         });
 
-        // 3. Update
         String updatedName = TestDataGenerator.getRealisticName();
         String updatedJob = TestDataGenerator.getRealisticJob();
         UpdateUserResponse updatedUser = step("Обновление пользователя", () ->
                 updateUserById(2, updatedName, updatedJob)
         );
 
-        // 4. Verify update
         step("Проверка обновления", () -> {
             assertEquals(updatedName, updatedUser.getName());
             assertEquals(updatedJob, updatedUser.getJob());
         });
 
-        // 5. Delete
         step("Удаление пользователя", () ->
                 deleteUserById(2)
         );

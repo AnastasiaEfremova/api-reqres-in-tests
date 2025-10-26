@@ -11,7 +11,7 @@ import org.aeonbits.owner.Config;
 public interface ReqresConfig extends Config {
 
     @Key("base.url")
-    @DefaultValue("https://reqres.in")
+    @DefaultValue("https://reqres.in/api")
     String baseUrl();
 
     @Key("api.key")

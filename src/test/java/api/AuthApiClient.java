@@ -1,7 +1,7 @@
 package api;
 
-import models.login.LoginRequest;
-import models.login.LoginResponse;
+import models.auth.AuthRequest;
+import models.auth.LoginResponse;
 import models.ErrorResponse;
 
 import static io.restassured.RestAssured.given;
@@ -9,7 +9,7 @@ import static specs.ApiSpecs.*;
 
 public class AuthApiClient {
 
-    public static LoginResponse login(LoginRequest loginBody) {
+    public static LoginResponse login(AuthRequest loginBody) {
         return given(getAuthSpec())
                 .body(loginBody)
                 .when()
@@ -19,7 +19,7 @@ public class AuthApiClient {
                 .extract().as(LoginResponse.class);
     }
 
-    public static ErrorResponse loginError(LoginRequest loginBody) {
+    public static ErrorResponse loginError(AuthRequest loginBody) {
         return given(getAuthSpec())
                 .body(loginBody)
                 .when()

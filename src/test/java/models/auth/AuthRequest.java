@@ -1,4 +1,4 @@
-package models.createUser;
+package models.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateUserRequest {
-    private String name;
-    private String job;
+public class AuthRequest {
+
+    private String email;
+    private String password;
 }

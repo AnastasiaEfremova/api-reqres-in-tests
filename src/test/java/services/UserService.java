@@ -1,11 +1,10 @@
 package services;
 
 import io.qameta.allure.Step;
-import models.createUser.CreateUserRequest;
-import models.createUser.CreateUserResponse;
-import models.getUsers.UserResponse;
-import models.updateUser.UpdateUserRequest;
-import models.updateUser.UpdateUserResponse;
+import models.users.CreateUserResponse;
+import models.users.UserRequest;
+import models.users.UserResponse;
+import models.users.UpdateUserResponse;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static api.UsersApiClient.*;
@@ -24,7 +23,7 @@ public class UserService {
 
     @Step("Создание пользователя с именем: {name} и должностью: {job}")
     public static CreateUserResponse createNewUser(String name, String job) {
-        CreateUserRequest request = new CreateUserRequest(name, job);
+        UserRequest request = new UserRequest(name, job);
         CreateUserResponse response = createUser(request);
 
         assertAll("Проверка созданного пользователя",
@@ -38,7 +37,7 @@ public class UserService {
 
     @Step("Полное обновление пользователя ID: {userId}")
     public static UpdateUserResponse updateUserById(int userId, String name, String job) {
-        UpdateUserRequest request = new UpdateUserRequest(name, job);
+        UserRequest request = new UserRequest(name, job);
         UpdateUserResponse response = updateUser(request, userId);
 
         assertAll("Проверка обновленного пользователя",
@@ -51,7 +50,7 @@ public class UserService {
 
     @Step("Частичное обновление пользователя ID: {userId}")
     public static UpdateUserResponse patchUserById(int userId, String name, String job) {
-        UpdateUserRequest request = new UpdateUserRequest(name, job);
+        UserRequest request = new UserRequest(name, job);
         UpdateUserResponse response = patchUser(request, userId);
 
         assertAll("Проверка частично обновленного пользователя",
